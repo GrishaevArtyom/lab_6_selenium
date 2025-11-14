@@ -8,29 +8,17 @@ on:
 
 jobs:
   run_tests:
-    name: Run pytest
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Python 3.9
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
 
-      - name: Install Chrome (required for Selenium)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y wget gnupg
-          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg
-          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
-          sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
-
-      - name: Setup ChromeDriver
-        uses: nanasess/setup-chromedriver@v2
+      - name: Setup Chrome & ChromeDriver
+        uses: browser-actions/setup-chrome@v1
         with:
           chrome-version: stable
 
@@ -40,8 +28,4 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run tests
-        run: |
-          python -m pytest tests/ -v
-        env:
-          # Убедимся, что chromedriver найдётся
-          PATH: $PATH:$CHROMEWEBDRIVER
+        run: python -m pytest tests/ -v
